@@ -63,7 +63,7 @@ SlideSplash::SlideSplash(sf::RenderWindow& window)
 
 bool SlideSplash::addImage(const std::string& filename)
 {
-	slides.push_back(Slide{});
+	slides.emplace_back();
 	return slides.back().texture.loadFromFile(filename);
 }
 
