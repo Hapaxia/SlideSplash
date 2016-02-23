@@ -38,7 +38,7 @@
 #include <string>
 #include <vector>
 
-// Slide Splash v1.0.1
+// Slide Splash v1.1.0
 class SlideSplash
 {
 public:
@@ -47,6 +47,7 @@ public:
 		sf::Texture texture;
 		sf::Time delay{ sf::seconds(2.f) };
 		sf::Keyboard::Key key{ sf::Keyboard::Key::KeyCount }; // "Unknown" represents no key allowed. "KeyCount" represents any key allowed.
+		bool mouseButton{ true };
 	};
 
 	std::vector<Slide> slides;

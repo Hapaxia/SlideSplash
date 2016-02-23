@@ -105,8 +105,7 @@ bool SlideSplash::play()
 		{
 			if (event.type == sf::Event::Closed)
 				return false;
-
-			if (event.type == sf::Event::KeyPressed)
+			else if (event.type == sf::Event::KeyPressed)
 			{
 				if (isCorrectKey(event.key.code, m_closeKey))
 					return false;
@@ -117,6 +116,12 @@ bool SlideSplash::play()
 					if (!nextSlide(slideNumber, clock, slides))
 						return true;
 				}
+			}
+			else if (event.type == sf::Event::MouseButtonPressed)
+			{
+				if (slides[slideNumber].mouseButton)
+					if (!nextSlide(slideNumber, clock, slides))
+						return true;
 			}
 		}
 		if (clock.getElapsedTime() > slides[slideNumber].delay)
