@@ -32,6 +32,8 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+
+
 namespace
 {
 
@@ -41,17 +43,48 @@ inline bool isCorrectKey(const sf::Keyboard::Key& keyCode, const sf::Keyboard::K
 		return false;
 	if (keyControl == sf::Keyboard::Key::KeyCount) // any key accepted
 		return true;
-
 	return keyCode == keyControl;
 }
 
-inline bool nextSlide(unsigned int& slideNumber, sf::Clock& clock, const std::vector<SlideSplash::Slide>& slides)
+inline void setSprite(sf::Sprite& sprite, const SlideSplash::Slide& slide, sf::RenderWindow* window)
 {
+	sprite.setTexture(slide.texture, true);
+	const sf::Vector2f windowSize(window->getSize());
+	const sf::Vector2f imageSize(slide.texture.getSize());
+	if (slide.sizing == SlideSplash::Slide::Sizing::Zoom)
+	{
+		const float windowRatio{ windowSize.x / windowSize.y };
+		const float imageRatio{ imageSize.x / imageSize.y };
+		float scale;
+		if (imageRatio > windowRatio)
+		{
+			scale = windowSize.y / imageSize.y;
+			sprite.setPosition({ (1.f - scale) * windowSize.x, 0.f });
+		}
+		else
+		{
+			scale = windowSize.x / imageSize.x;
+			sprite.setPosition({ 0.f, (1.f - scale) * windowSize.y });
+		}
+		sprite.setScale(scale, scale);
+	}
+	else // Stretch
+	{
+		sprite.setPosition({ 0, 0 });
+		sprite.setScale({ windowSize.x / imageSize.x, windowSize.y / imageSize.y });
+	}
+}
+
+inline bool nextSlide(unsigned int& slideNumber, sf::Clock& clock, const std::vector<SlideSplash::Slide>& slides, sf::Sprite& previousSprite, sf::RenderWindow* window)
+{
+	setSprite(previousSprite, slides[slideNumber], window);
 	clock.restart();
 	return (++slideNumber < slides.size());
 }
 
 } // namespace
+
+
 
 SlideSplash::SlideSplash(sf::RenderWindow& window)
 	: m_window(&window)
@@ -95,11 +128,13 @@ void SlideSplash::setCloseKey(const sf::Keyboard::Key& key)
 bool SlideSplash::play()
 {
 	sf::Sprite mainSprite;
+	sf::Sprite previousSprite;
 	unsigned int slideNumber{ 0u };
 	sf::Clock clock;
+	bool inTransition{ true };
+	setSprite(mainSprite, slides.front(), m_window);
 	while (true)
 	{
-		m_window->clear(m_backgroundColor);
 		sf::Event event;
 		while (m_window->pollEvent(event))
 		{
@@ -111,26 +146,55 @@ bool SlideSplash::play()
 					return false;
 				if (isCorrectKey(event.key.code, m_skipKey))
 					return true;
-				if (isCorrectKey(event.key.code, slides[slideNumber].key))
+				if (isCorrectKey(event.key.code, slides[slideNumber].key) && !inTransition)
 				{
-					if (!nextSlide(slideNumber, clock, slides))
-						return true;
+					if (nextSlide(slideNumber, clock, slides, previousSprite, m_window))
+						setSprite(mainSprite, slides[slideNumber], m_window);
+					else
+						goto FINAL_TRANSITION;
 				}
 			}
-			else if (event.type == sf::Event::MouseButtonPressed)
+			else if (event.type == sf::Event::MouseButtonPressed && !inTransition)
 			{
 				if (slides[slideNumber].mouseButton)
-					if (!nextSlide(slideNumber, clock, slides))
-						return true;
+				{
+					if (nextSlide(slideNumber, clock, slides, previousSprite, m_window))
+						setSprite(mainSprite, slides[slideNumber], m_window);
+					else
+						goto FINAL_TRANSITION;
+				}
 			}
 		}
 		if (clock.getElapsedTime() > slides[slideNumber].delay)
 		{
-			if (!nextSlide(slideNumber, clock, slides))
-				return true;
+			if (nextSlide(slideNumber, clock, slides, previousSprite, m_window))
+				setSprite(mainSprite, slides[slideNumber], m_window);
+			else
+				goto FINAL_TRANSITION;
 		}
-		mainSprite.setTexture(slides[slideNumber].texture);
+		inTransition = clock.getElapsedTime() < slides[slideNumber].transition;
+		m_window->clear(m_backgroundColor);
+		if (inTransition)
+		{
+			float ratio{ clock.getElapsedTime() / slides[slideNumber].transition };
+			mainSprite.setColor(sf::Color(255, 255, 255, static_cast<sf::Uint8>(255 * ratio)));
+			m_window->draw(previousSprite);
+		}
 		m_window->draw(mainSprite);
 		m_window->display();
 	}
+
+FINAL_TRANSITION:
+
+	setSprite(previousSprite, slides.back(), m_window);
+	clock.restart();
+	while (clock.getElapsedTime() < slides[0].transition)
+	{
+		float ratio{ 1.f - (clock.getElapsedTime() / slides[0].transition) };
+		previousSprite.setColor(sf::Color(255, 255, 255, static_cast<sf::Uint8>(255 * ratio)));
+		m_window->clear(m_backgroundColor);
+		m_window->draw(previousSprite);
+		m_window->display();
+	}
+	return true;
 }

@@ -35,19 +35,28 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <string>
 #include <vector>
 
-// Slide Splash v1.1.0
+// Slide Splash v1.2.0
 class SlideSplash
 {
 public:
 	struct Slide
 	{
+		enum class Sizing
+		{
+			Stretch,
+			Zoom
+		};
+
 		sf::Texture texture;
-		sf::Time delay{ sf::seconds(2.f) };
+		sf::Time delay{ sf::seconds(5.f) };
+		sf::Time transition{ sf::seconds(2.f) };
 		sf::Keyboard::Key key{ sf::Keyboard::Key::KeyCount }; // "Unknown" represents no key allowed. "KeyCount" represents any key allowed.
 		bool mouseButton{ true };
+		Sizing sizing{ Sizing::Stretch };
 	};
 
 	std::vector<Slide> slides;
