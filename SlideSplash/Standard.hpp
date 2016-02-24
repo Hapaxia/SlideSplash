@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-// Slide Splash v1.2.0
+// Slide Splash v1.2.1
 class SlideSplash
 {
 public:

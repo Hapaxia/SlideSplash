@@ -33,7 +33,7 @@
 #include "Standard.hpp"
 #include <SFML/Window/WindowStyle.hpp>
 
-// Slide Splash Window (Slide Splash v1.2.0)
+// Slide Splash Window (Slide Splash v1.2)
 class SlideSplashWindow
 {
 public:
