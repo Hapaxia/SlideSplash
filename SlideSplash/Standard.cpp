@@ -59,12 +59,12 @@ inline void setSprite(sf::Sprite& sprite, const SlideSplash::Slide& slide, sf::R
 		if (imageRatio > windowRatio)
 		{
 			scale = windowSize.y / imageSize.y;
-			sprite.setPosition({ (1.f - scale) * windowSize.x, 0.f });
+			sprite.setPosition({ -(scale * imageSize.x - windowSize.x) / 2.f, 0.f });
 		}
 		else
 		{
 			scale = windowSize.x / imageSize.x;
-			sprite.setPosition({ 0.f, (1.f - scale) * windowSize.y });
+			sprite.setPosition({ 0.f, -(scale * imageSize.y - windowSize.y) / 2.f });
 		}
 		sprite.setScale(scale, scale);
 	}
