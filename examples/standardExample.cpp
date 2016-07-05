@@ -1,3 +1,20 @@
+//////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  SlideSplash *EXAMPLE*
+//
+//  by Hapax (https://github.com/Hapaxia)
+//
+//
+//    Controls:
+//
+//  Escape          Quit (closes window during initial slideshow and recalled slideshow but not the main application)
+//  Space           Recalls slideshow from "main application" (the empty window) - does not close main application
+//  Return          Skips slideshow (skips to main application during initial slideshow and returns to main application from recalled slideshow)
+//  Any other key   Skips slide
+//  Mouse Button    Skips slide
+//
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 #include <SFML/Graphics.hpp>
 #include <SlideSplash.hpp>
 
