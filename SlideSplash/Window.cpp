@@ -47,9 +47,9 @@ bool SlideSplashWindow::play()
 		m_size = slides[0].texture.getSize();
 
 	const sf::VideoMode desktopMode{ sf::VideoMode::getDesktopMode() };
+	m_window.setVerticalSyncEnabled(true);
 	m_window.create(sf::VideoMode(m_size.x, m_size.y), m_name, m_style);
 	m_window.setPosition(sf::Vector2i((static_cast<int>(desktopMode.width) - m_size.x) / 2, (static_cast<int>(desktopMode.height) - m_size.y) / 2));
-	m_window.setVerticalSyncEnabled(true);
 
 	bool result{ m_slideSplash.play() };
 
