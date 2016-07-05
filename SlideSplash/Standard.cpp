@@ -140,6 +140,13 @@ bool SlideSplash::play()
 		{
 			if (event.type == sf::Event::Closed)
 				return false;
+			else if (event.type == sf::Event::Resized)
+			{
+				m_window->setView(sf::View({ 0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height) }));
+				setSprite(mainSprite, slides[slideNumber], m_window);
+				if (slideNumber > 0)
+					setSprite(previousSprite, slides[slideNumber - 1], m_window);
+			}
 			else if (event.type == sf::Event::KeyPressed)
 			{
 				if (isCorrectKey(event.key.code, m_closeKey))
